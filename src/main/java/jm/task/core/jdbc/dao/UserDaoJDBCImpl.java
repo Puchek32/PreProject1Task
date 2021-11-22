@@ -3,10 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,16 +39,12 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         try (Connection conn = Util.getConnection()) {
-            String sql =
-                    "insert into user (name, lastname, age) values ('" +
-                            name +
-                            "', '" +
-                            lastName +
-                            "',"
-                            + age
-                            + ");";
-            Statement st = conn.createStatement();
-            st.executeUpdate(sql);
+            PreparedStatement pst =
+                    conn.prepareStatement("insert into user (name, lastname, age) values (?, ?, ?)");
+            pst.setString(1, name);
+            pst.setString(2, lastName);
+            pst.setByte(3, age);
+            pst.executeUpdate();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (SQLException e) {
             e.printStackTrace();
